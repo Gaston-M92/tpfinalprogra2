@@ -1,0 +1,5 @@
+package Enums;
+
+public enum Especialidad {
+    CLINICA_MEDICA, PEDIATRIA, CARDIOLOGIA, DERMATOLOGIA, TRAUMATOLOGIA, GINECOLOGIA
+}

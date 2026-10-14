@@ -3,14 +3,14 @@ import java.sql.Date;
 public abstract class Persona {
     private String nombre;
     private String apellido;
-    private Date fechaNac;
-    private int sexo;
+    private String dni;
+    private String telefono;
 
-    public Persona(String nombre, String apellido, Date fechaNac, int sexo) {
+    public Persona(String nombre, String apellido, String dni, String telefono) {
         this.nombre = nombre;
         this.apellido = apellido;
-        this.fechaNac = fechaNac;
-        this.sexo = sexo;
+        this.dni = dni;
+        this.telefono = telefono;
     }
 
     public Persona() {
@@ -32,20 +32,20 @@ public abstract class Persona {
         this.apellido = apellido;
     }
 
-    public Date getFechaNac() {
-        return fechaNac;
+    public String getDni() {
+        return dni;
     }
 
-    public void setFechaNac(Date fechaNac) {
-        this.fechaNac = fechaNac;
+    public void setDni(String dni) {
+        this.dni = dni;
     }
 
-    public int getSexo() {
-        return sexo;
+    public String getTelefono() {
+        return telefono;
     }
 
-    public void setSexo(int sexo) {
-        this.sexo = sexo;
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     @Override
@@ -53,8 +53,8 @@ public abstract class Persona {
         return "Persona{" +
                 "nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
-                ", fechaNac=" + fechaNac +
-                ", sexo=" + sexo +
+                ", dni='" + dni + '\'' +
+                ", telefono='" + telefono + '\'' +
                 '}';
     }
 }
