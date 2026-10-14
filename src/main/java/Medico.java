@@ -1,6 +1,8 @@
 import Enums.Especialidad;
 
-public class Medico extends Persona implements Especialidad {
+import java.util.ArrayList;
+
+public class Medico extends Persona{
     private String matricula;
     private Especialidad especialidad;
     private int duracionTurnoMin;
