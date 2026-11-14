@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/turnos_db
+db.usuario=root
+db.clave=COMPLETAR_CON_TU_CLAVE

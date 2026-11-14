@@ -53,3 +53,4 @@ build/
 ### Mac OS ###
 .DS_Store
 desktop.ini
+src/main/resources/db.properties
