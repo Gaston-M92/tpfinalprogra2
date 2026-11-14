@@ -1,3 +1,5 @@
+package modelo;
+
 import Enums.Especialidad;
 
 import java.util.ArrayList;

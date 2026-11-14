@@ -1,3 +1,5 @@
+package modelo;
+
 import Enums.EstadoTurno;
 
 import java.time.LocalDateTime;

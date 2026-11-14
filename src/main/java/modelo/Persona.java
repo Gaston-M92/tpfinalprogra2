@@ -1,3 +1,5 @@
+package modelo;
+
 import java.sql.Date;
 
 public abstract class Persona {
