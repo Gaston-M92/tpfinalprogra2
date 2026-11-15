@@ -54,26 +54,62 @@ public class GestorTurnos implements Reportable {
         medicos.agregar(m);
     }
 
-    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException {
+    /**
+     * Busca un medico por su DNI
+     */
 
-        Paciente p = pacientes.buscarPorId(dni);
+    public Medico buscarMedico(String dni){
+        return medicos.buscarPorId(dni);
+    }
 
-        if (p == null) {
-            throw new PacienteNoEncontradoException(dni);
-        }
+    /**
+     * Devuelve todos los pacientes ordenados por apellido y nombre
+     */
 
-        if (!m.atiendeEn(fechaHora)) {
-            throw new HorarioNoDisponibleException(dni);
+    public ArrayList<Paciente> listarPacientes(){
+        ArrayList<Paciente> lista = pacientes.listar();
+        Collections.sort(lista);
+        return lista;
+    }
+
+    /**
+     * Devuelve todos los medicos registrados
+     */
+
+    public ArrayList<Medico> listarMedicos(){
+        return medicos.listar();
+    }
+
+    /**
+     * Asigna un turno nuevo a un paciente con un medico.
+     * Valida que el paciente exista, que el medico atienda en ese horario
+     * y que ni el medico ni el paciente tengan otro turno que se superponga.
+     *
+     * @throws PacienteNoEncontradoException si no existe un paciente con ese DNI
+     * @throws HorarioNoDisponibleException si el medico no atiende en ese dia y horario
+     * @throws TurnoSuperpuestoException si el medico o el paciente ya tienen un turno en ese horario
+     */
+
+    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException{
+        Paciente p = buscarPaciente(dni);
+
+        if(!m.atiendeEn(fechaHora)){
+            throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto() + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
         }
 
         Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
 
-        for (Turno t : turnos.listar()) {
-            if (t.getMedico().equals(m) && t.getEstado() != EstadoTurno.CANCELADO && t.seSuperponeCon(nuevoTurno)) {
-                throw new TurnoSuperpuestoException("El médico ya tiene un turno en ese horario");
+        for(Turno t : turnos.listar()){
+            if(t.getEstado() == EstadoTurno.CANCELADO || !t.seSuperponeCon(nuevoTurno)){
+                continue;
+            }
+            if(t.getMedico().getDni().equals(m.getDni())){
+                throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto() + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
+            }
+            if(t.getPaciente().getDni().equals(dni)){
+                throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto() + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
             }
         }
-
         turnos.agregar(nuevoTurno);
         return nuevoTurno;
     }
@@ -146,33 +182,35 @@ public class GestorTurnos implements Reportable {
         return horariosLibres;
     }
 
-        public ArrayList<Turno> listarTurnosPorMedico (Medico m, LocalDate fecha){
-            ArrayList<Turno> lista = new ArrayList<>();
+    /**
+     * Devuelve los turnos de un medico en una fecha, ordenados por hora.
+     */
 
-            for (Turno t : turnos.listar()) {
-                if (t.getMedico().equals(m)
-                        && t.getFechaHora().toLocalDate().equals(fecha)) {
-                    lista.add(t);
-                }
+    public ArrayList<Turno> listarTurnosPorMedico(Medico medico,  LocalDate fecha){
+        ArrayList<Turno> lista = new ArrayList<>();
+        for(Turno t : turnos.listar()){
+            if(t.getMedico().getDni().equals(medico.getDni()) && t.getFechaHora().toLocalDate().equals(fecha)){
+                lista.add(t);
             }
-
-            return lista;
-
         }
+        Collections.sort(lista);
+        return lista;
+    }
 
-        public ArrayList<Turno> listarTurnosPorPaciente (String dni){
-            ArrayList<Turno> lista = new ArrayList<>();
+    /**
+     * Devuelve todos los turnos de un paciente, ordenados por fecha y hora.
+     */
 
-            for (Turno t : turnos.listar()) {
-                if (t.getPaciente().getDni().equals(dni)) {
-                    lista.add(t);
-                }
+    public ArrayList<Turno> listarTurnosPorPaciente(String dni){
+        ArrayList<Turno> lista = new ArrayList<>();
+        for(Turno t : turnos.listar()){
+            if(t.getPaciente().getDni().equals(dni)){
+                lista.add(t);
             }
-            return lista;
-
         }
-
-
+        Collections.sort(lista);
+        return lista;
+    }
 
         @Override
         public String generarReporteEstadistico () {
