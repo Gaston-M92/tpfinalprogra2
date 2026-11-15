@@ -20,9 +20,6 @@ public abstract class Persona implements Identificable {
         this.telefono = telefono;
     }
 
-    public Persona() {
-    }
-
     public String getNombre() {
         return nombre;
     }
@@ -53,6 +50,11 @@ public abstract class Persona implements Identificable {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+
+    public String getNombreCompleto() {
+        return nombre + " " + apellido;
     }
 
     /**

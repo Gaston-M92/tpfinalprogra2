@@ -27,8 +27,8 @@ public class GestorTurnos implements Reportable {
         consultorios = new ArrayList<>();
     }
 
-    public void registrarPaciente(Paciente p){
-
+    public void registrarPaciente(Paciente p) {
+        pacientes.agregar(p);
     }
 
     public Paciente buscarPaciente(String dni) throws PacienteNoEncontradoException {
@@ -57,9 +57,8 @@ public class GestorTurnos implements Reportable {
         Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
 
         for (Turno t : turnos.listar()) {
-            if (t.getEstado() != EstadoTurno.CANCELADO
-                    && t.seSuperponeCon(nuevoTurno)) {
-                throw new TurnoSuperpuestoException("El turno ya esta superpuesto");
+            if (t.getMedico().equals(m) && t.getEstado() != EstadoTurno.CANCELADO && t.seSuperponeCon(nuevoTurno)) {
+                throw new TurnoSuperpuestoException("El médico ya tiene un turno en ese horario");
             }
         }
 
@@ -78,7 +77,8 @@ public class GestorTurnos implements Reportable {
         if (t.getEstado() != EstadoTurno.RESERVADO) {
             throw new TurnoNoCancelableException(idTurno);
         }
-        t.setEstado(EstadoTurno.CANCELADO);
+
+        t.cancelar();
     }
 
     public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha) {
@@ -104,7 +104,7 @@ public class GestorTurnos implements Reportable {
 
                             for (Turno t : turnos.listar()) {
 
-                                if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m)) {
+                                if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m) && t.getFechaHora().toLocalDate().equals(fecha)) {{
 
                                     LocalDateTime inicioExistente = t.getFechaHora();
                                     LocalDateTime finExistente = inicioExistente.plusMinutes(t.getMedico().getDuracionTurnoMin());
@@ -116,7 +116,7 @@ public class GestorTurnos implements Reportable {
                                 }
                             }
 
-                            if (disponible) {
+                            if (disponible && !horariosLibres.contains(inicioNuevo)) {
                                 horariosLibres.add(inicioNuevo);
                             }
 
@@ -148,7 +148,7 @@ public class GestorTurnos implements Reportable {
         ArrayList<Turno> lista = new ArrayList<>();
 
         for (Turno t : turnos.listar()) {
-            if(t.getPaciente().equals(dni)){
+            if (t.getPaciente().getDni().equals(dni)) {
                 lista.add(t);
             }
         }

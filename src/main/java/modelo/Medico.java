@@ -21,7 +21,7 @@ public class Medico extends Persona{
         this.matricula = matricula;
         this.especialidad = especialidad;
         this.duracionTurnoMin = duracionTurnoMin;
-        this.horarios = new ArrayList<>();
+        this.horarios = new ArrayList<>(horarios);
     }
 
     public String getMatricula() {

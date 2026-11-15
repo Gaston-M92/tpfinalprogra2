@@ -12,7 +12,7 @@ import java.util.UUID;
  * Relaciona un paciente con un médico en una fecha y hora determinada.
  * Almacena el motivo de consulta y el estado actual del turno.
  */
-public class Turno implements Identificable {
+public class Turno implements Identificable, Comparable<Turno>{
 
     private String id;
     private Paciente paciente;
@@ -99,6 +99,18 @@ public class Turno implements Identificable {
         this.estado = estado;
     }
 
+    public void cancelar() {
+        this.estado = EstadoTurno.CANCELADO;
+    }
+
+    public void marcarAtendido() {
+        this.estado = EstadoTurno.ATENDIDO;
+    }
+
+    public void marcarAusente() {
+        this.estado = EstadoTurno.AUSENTE;
+    }
+
     /**
      * Verifica si este turno se superpone con otro turno.
      *
@@ -115,5 +127,10 @@ public class Turno implements Identificable {
                 otro.medico.getDuracionTurnoMin());
 
         return inicio1.isBefore(fin2) && inicio2.isBefore(fin1);
+    }
+
+    @Override
+    public int compareTo(Turno otro) {
+        return this.fechaHora.compareTo(otro.fechaHora);
     }
 }
