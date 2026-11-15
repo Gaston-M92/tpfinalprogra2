@@ -54,3 +54,6 @@ build/
 .DS_Store
 desktop.ini
 src/main/resources/db.properties
+
+src/main/java/out/
+src/main/**/.idea/
