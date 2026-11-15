@@ -50,8 +50,16 @@ public abstract class Persona implements Identificable {
         this.telefono = telefono;
     }
 
+    /**
+     * Devuelve una ficha con los datos de la persona.
+     * Cada subclase la arma a su manera (polimorfismo).
+     */
     public abstract String generarFicha();
 
+    /**
+     * Devuelve el identificador de la persona, que es su DNI.
+     * Lo usa Repositorio para buscar y eliminar elementos.
+     */
     @Override
     public String getId() {
         return dni;

@@ -50,6 +50,9 @@ public class Medico extends Persona{
         this.horarios = horarios;
     }
 
+    /**
+     * Utiliza generarFicha por parte de la clase Paciente.
+     */
     @Override
     public String generarFicha() {
         return "MÉDICO - " + getApellido() + ", " + getNombre()
