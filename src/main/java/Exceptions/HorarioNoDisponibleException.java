@@ -1,6 +1,6 @@
 package Exceptions;
 
-public class HorarioNoDisponibleException extends RuntimeException {
+public class HorarioNoDisponibleException extends Exception {
     public HorarioNoDisponibleException(String message) {
         super(message);
     }

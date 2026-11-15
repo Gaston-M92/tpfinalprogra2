@@ -1,10 +1,11 @@
 package modelo;
 
 import Enums.EstadoTurno;
+import Interfaces.Identificable;
 
 import java.time.LocalDateTime;
 
-public class Turno {
+public class Turno implements Identificable {
     private String id;
     private Paciente paciente;
     private Medico medico;
@@ -68,4 +69,6 @@ public class Turno {
     public void setEstado(EstadoTurno estado) {
         this.estado = estado;
     }
+
+
 }
