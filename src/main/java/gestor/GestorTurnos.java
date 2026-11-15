@@ -105,7 +105,7 @@ public class GestorTurnos implements Reportable {
                             for (Turno t : turnos.listar()) {
 
                                 if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m) && t.getFechaHora().toLocalDate().equals(fecha)) {
-                                    {
+
 
                                         LocalDateTime inicioExistente = t.getFechaHora();
                                         LocalDateTime finExistente = inicioExistente.plusMinutes(t.getMedico().getDuracionTurnoMin());
@@ -115,7 +115,6 @@ public class GestorTurnos implements Reportable {
                                             break;
                                         }
                                     }
-                                }
 
                                 if (disponible && !horariosLibres.contains(inicioNuevo)) {
                                     horariosLibres.add(inicioNuevo);
