@@ -3,6 +3,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import Enums.Especialidad;
 import Enums.EstadoTurno;
@@ -40,6 +41,17 @@ public class GestorTurnos implements Reportable {
 
         return p;
 
+    }
+
+    /**
+     * Registra un medico en el sistema
+     *
+
+     * @param m medico a registrar
+     */
+
+    public void registrarMedico(Medico m){
+        medicos.agregar(m);
     }
 
     public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException {
@@ -81,53 +93,56 @@ public class GestorTurnos implements Reportable {
         t.cancelar();
     }
 
-    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha) {
+    /**
+     * Busca los horarios libres de todos los medicos de una especialidad en una fecha.
+     * Recorre cada horario de atencion del medico para ese dia, lo divide en franjas
+     * segun la duracion de turno, y descarta las franjas ocupadas por turnos no cancelados.
+     *
+     * @param especialidad especialidad buscada
+     * @param fecha dia para el que se buscan horarios
+     * @return lista de fechas y horas disponibles, ordenada
+     */
 
+    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha){
         ArrayList<LocalDateTime> horariosLibres = new ArrayList<>();
 
-        for (Medico m : medicos.listar()) {
+        for(Medico m : medicos.listar()){
+            int duracion = m.getDuracionTurnoMin();
+            if(m.getEspecialidad() != especialidad || duracion <= 0){
+                continue;
+            }
 
-            if (m.getEspecialidad() == especialidad) {
+            for(HorarioAtencion h : m.getHorarios()){
+                if(h.getDia() != fecha.getDayOfWeek()){
+                    continue;
+                }
 
-                for (HorarioAtencion h : m.getHorarios()) {
+                LocalTime hora = h.getHoraInicio();
+                while(!hora.plusMinutes(duracion).isAfter(h.getHoraFin())){
+                    LocalDateTime inicioNuevo = fecha.atTime(hora);
+                    LocalDateTime finNuevo = inicioNuevo.plusMinutes(duracion);
 
-                    if (h.getDia() == fecha.getDayOfWeek()) {
-
-                        LocalTime hora = h.getHoraInicio();
-
-                        while (!hora.plusMinutes(m.getDuracionTurnoMin()).isAfter(h.getHoraFin())) {
-
-                            LocalDateTime inicioNuevo = fecha.atTime(hora);
-                            LocalDateTime finNuevo = inicioNuevo.plusMinutes(m.getDuracionTurnoMin());
-
-                            boolean disponible = true;
-
-                            for (Turno t : turnos.listar()) {
-
-                                if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m) && t.getFechaHora().toLocalDate().equals(fecha)) {
-
-
-                                        LocalDateTime inicioExistente = t.getFechaHora();
-                                        LocalDateTime finExistente = inicioExistente.plusMinutes(t.getMedico().getDuracionTurnoMin());
-
-                                        if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
-                                            disponible = false;
-                                            break;
-                                        }
-                                    }
-
-                                if (disponible && !horariosLibres.contains(inicioNuevo)) {
-                                    horariosLibres.add(inicioNuevo);
-                                }
-
-                                hora = hora.plusMinutes(m.getDuracionTurnoMin());
+                    boolean disponible = true;
+                    for(Turno t : turnos.listar()){
+                        boolean mismoMedico = t.getMedico().getDni().equals(m.getDni());
+                        if(mismoMedico && t.getEstado() != EstadoTurno.CANCELADO){
+                            LocalDateTime inicioExistente = t.getFechaHora();
+                            LocalDateTime finExistente = inicioExistente.plusMinutes(duracion);
+                            if(inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)){
+                                disponible = false;
+                                break;
                             }
                         }
                     }
+                    if(disponible && !horariosLibres.contains(inicioNuevo)){
+                        horariosLibres.add(inicioNuevo);
+                    }
+                    hora = hora.plusMinutes(duracion);
                 }
             }
-
         }
+
+        Collections.sort(horariosLibres);
         return horariosLibres;
     }
 
