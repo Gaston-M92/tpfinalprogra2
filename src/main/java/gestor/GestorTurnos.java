@@ -131,17 +131,54 @@ public class GestorTurnos implements Reportable {
     }
 
     public ArrayList<Turno> listarTurnosPorMedico(Medico m, LocalDate fecha){
+        ArrayList<Turno> lista = new ArrayList<>();
+
+        for (Turno t : turnos.listar()) {
+            if (t.getMedico().equals(m)
+                    && t.getFechaHora().toLocalDate().equals(fecha)) {
+                lista.add(t);
+            }
+        }
+
+        return lista;
 
     }
 
     public ArrayList<Turno> listarTurnosPorPaciente(String dni){
+        ArrayList<Turno> lista = new ArrayList<>();
+
+        for (Turno t : turnos.listar()) {
+            if(t.getPaciente().equals(dni)){
+                lista.add(t);
+            }
+        }
+        return lista;
 
     }
 
 
     @Override
     public String generarReporteEstadistico() {
-        // Nuestra lógica
+        int reservados = 0;
+        int atendidos = 0;
+        int cancelados = 0;
+        int ausentes = 0;
+        for (Turno t : turnos.listar()) {
+            switch (t.getEstado()) {
+                case RESERVADO:
+                    reservados++;
+                    break;
+                case ATENDIDO:
+                    atendidos++;
+                    break;
+                case CANCELADO:
+                    cancelados++;
+                    break;
+                case AUSENTE:
+                    ausentes++;
+                    break;
+            }
+        }
     }
 
 
