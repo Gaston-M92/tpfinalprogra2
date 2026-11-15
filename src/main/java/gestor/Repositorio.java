@@ -25,6 +25,7 @@ public class Repositorio<T extends Identificable>{
                 return elemento;
             }
         }
+        return null;
     }
 
     public ArrayList<T> listar(){

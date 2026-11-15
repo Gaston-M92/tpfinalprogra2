@@ -1,8 +1,8 @@
 package modelo;
 
-import java.sql.Date;
+import Interfaces.Identificable;
 
-public abstract class Persona {
+public abstract class Persona implements Identificable {
     private String nombre;
     private String apellido;
     private String dni;
@@ -48,6 +48,11 @@ public abstract class Persona {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    @Override
+    public String getId() {
+        return dni;
     }
 
     @Override
