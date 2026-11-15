@@ -3,7 +3,7 @@ package gestor;
 import Interfaces.Identificable;
 import java.util.ArrayList;
 
-public class Repositorio<T extends Identificable>{
+public class Gestor<T extends Identificable>{
     /**
      * Colección genérica de elementos identificables.
      * Permite agregar, eliminar, buscar por id y listar cualquier tipo
@@ -14,7 +14,7 @@ public class Repositorio<T extends Identificable>{
 
     private ArrayList<T> elementos;
 
-    public Repositorio(){
+    public Gestor(){
         elementos = new ArrayList<>();
     }
 
