@@ -1,7 +1,7 @@
 package modelo;
 
 import Enums.Especialidad;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +21,7 @@ public class Medico extends Persona{
         this.matricula = matricula;
         this.especialidad = especialidad;
         this.duracionTurnoMin = duracionTurnoMin;
-        this.horarios = horarios;
+        this.horarios = new ArrayList<>();
     }
 
     public String getMatricula() {
@@ -55,6 +55,34 @@ public class Medico extends Persona{
     public void setHorarios(ArrayList<HorarioAtencion> horarios) {
         this.horarios = horarios;
     }
+
+    /**
+     * Agrega un horario de atención a la lista de horarios del médico.
+     *
+     * @param h horario de atención que se desea agregar.
+     */
+    public void agregarHorario(HorarioAtencion h) {
+        horarios.add(h);
+    }
+
+    /**
+     * Verifica si el médico atiende en una fecha y hora determinadas.
+     *
+     * @param fechaHora fecha y hora que se desea consultar.
+     * @return "true" si el médico atiende en ese momento, "false" en caso contrario.
+     */
+    public boolean atiendeEn(LocalDateTime fechaHora) {
+
+        for (HorarioAtencion h : horarios) {
+            if (h.incluye(fechaHora)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     /**
      * Genera una ficha con los datos personales y profesionales del médico.

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import Enums.Especialidad;
 import Exceptions.PacienteNoEncontradoException;
 import Exceptions.TurnoNoCancelableException;
+import Exceptions.TurnoSuperpuestoException;
 import Interfaces.Reportable;
 import modelo.Consultorio;
 import modelo.Medico;
@@ -41,7 +42,11 @@ public class GestorTurnos implements Reportable {
 
     }
 
-    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo){
+    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoNoCancelableException, TurnoSuperpuestoException {
+        if(pacientes.buscarPorId(dni) == null){
+            throw new PacienteNoEncontradoException(dni);
+        }
+        if(m.ati)
 
     }
 

@@ -1,6 +1,7 @@
 package modelo;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -55,5 +56,17 @@ public class HorarioAtencion {
 
     public void setConsultorio(Consultorio consultorio) {
         this.consultorio = consultorio;
+    }
+
+    /**
+     * Verifica si una fecha y hora están comprendidas dentro del horario de atención.
+     *
+     * @param fechaHora fecha y hora que se desea verificar.
+     * @return "true" si coincide con el día y el rango horario, "false" en caso contrario.
+     */
+    public boolean incluye(LocalDateTime fechaHora) {
+        return fechaHora.getDayOfWeek() == dia
+                && !fechaHora.toLocalTime().isBefore(horaInicio)
+                && fechaHora.toLocalTime().isBefore(horaFin);
     }
 }
