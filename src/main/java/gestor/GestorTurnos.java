@@ -1,7 +1,9 @@
 package gestor;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import Enums.Especialidad;
 import Exceptions.PacienteNoEncontradoException;
 import Exceptions.TurnoNoCancelableException;
 import Interfaces.Reportable;
@@ -47,7 +49,17 @@ public class GestorTurnos implements Reportable {
 
     }
 
+    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha){
 
+    }
+
+    public ArrayList<Turno> listarTurnosPorMedico(Medico m, LocalDate fecha){
+
+    }
+
+    public ArrayList<Turno> listarTurnosPorPaciente(String dni){
+
+    }
 
 
     @Override
