@@ -1,4 +1,3 @@
-
 package modelo;
 
 import Enums.EstadoTurno;
@@ -12,9 +11,9 @@ import java.util.UUID;
  * Relaciona un paciente con un médico en una fecha y hora determinada.
  * Almacena el motivo de consulta y el estado actual del turno.
  */
-public class Turno implements Identificable, Comparable<Turno>{
+public class Turno implements Identificable, Comparable<Turno> {
 
-    private String id;
+    private String idTurno;
     private Paciente paciente;
     private Medico medico;
     private LocalDateTime fechaHora;
@@ -25,10 +24,10 @@ public class Turno implements Identificable, Comparable<Turno>{
      * Crea un turno con su identificador, paciente, médico,
      * fecha y hora, motivo de consulta y estado inicial.
      */
-    public Turno(String id, Paciente paciente, Medico medico,
+    public Turno(String idTurno, Paciente paciente, Medico medico,
                  LocalDateTime fechaHora, String motivoConsulta,
                  EstadoTurno estado) {
-        this.id = id;
+        this.idTurno = idTurno;
         this.paciente = paciente;
         this.medico = medico;
         this.fechaHora = fechaHora;
@@ -42,8 +41,7 @@ public class Turno implements Identificable, Comparable<Turno>{
      */
     public Turno(Paciente paciente, Medico medico,
                  LocalDateTime fechaHora, String motivoConsulta) {
-
-        this.id = UUID.randomUUID().toString();
+        this.idTurno = UUID.randomUUID().toString();
         this.paciente = paciente;
         this.medico = medico;
         this.fechaHora = fechaHora;
@@ -51,12 +49,14 @@ public class Turno implements Identificable, Comparable<Turno>{
         this.estado = EstadoTurno.RESERVADO;
     }
 
+    /** Devuelve el identificador del turno. */
+    @Override
     public String getId() {
-        return id;
+        return idTurno;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String idTurno) {
+        this.idTurno = idTurno;
     }
 
     public Paciente getPaciente() {
@@ -99,26 +99,36 @@ public class Turno implements Identificable, Comparable<Turno>{
         this.estado = estado;
     }
 
+    /** Cancela el turno. */
     public void cancelar() {
         this.estado = EstadoTurno.CANCELADO;
     }
 
-<<<<<<< Updated upstream
+    /** Marca el turno como atendido. */
     public void marcarAtendido() {
         this.estado = EstadoTurno.ATENDIDO;
     }
 
+    /** Marca al paciente como ausente. */
     public void marcarAusente() {
         this.estado = EstadoTurno.AUSENTE;
     }
 
     /**
      * Verifica si este turno se superpone con otro turno.
+     * Solo hay superposición si son del mismo médico, ninguno está
+     * cancelado y sus horarios se solapan.
      *
      * @param otro turno con el que se desea comparar.
      * @return true si los turnos se superponen, false en caso contrario.
      */
     public boolean seSuperponeCon(Turno otro) {
+        if (!this.medico.equals(otro.medico)
+                || this.estado == EstadoTurno.CANCELADO
+                || otro.estado == EstadoTurno.CANCELADO) {
+            return false;
+        }
+
         LocalDateTime inicio1 = this.fechaHora;
         LocalDateTime fin1 = inicio1.plusMinutes(
                 this.medico.getDuracionTurnoMin());
@@ -130,12 +140,9 @@ public class Turno implements Identificable, Comparable<Turno>{
         return inicio1.isBefore(fin2) && inicio2.isBefore(fin1);
     }
 
+    /** Compara por fecha y hora para ordenar los turnos cronológicamente. */
     @Override
     public int compareTo(Turno otro) {
         return this.fechaHora.compareTo(otro.fechaHora);
     }
-=======
-
-
->>>>>>> Stashed changes
 }
