@@ -61,8 +61,18 @@ public class GestorTurnos implements Reportable {
         return nuevoTurno;
     }
 
-    public void cancelarTurno(String idTurno) throws TurnoNoCancelableException{
+    public void cancelarTurno(String idTurno) throws TurnoNoCancelableException {
 
+        Turno t = turnos.buscarPorId(idTurno);
+
+        if (t == null) {
+            throw new TurnoNoCancelableException(idTurno);
+        }
+
+        if (t.getEstado() != EstadoTurno.RESERVADO) {
+            throw new TurnoNoCancelableException(idTurno);
+        }
+        t.setEstado(EstadoTurno.CANCELADO);
     }
 
     public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha){
