@@ -4,6 +4,13 @@ import Interfaces.Identificable;
 import java.util.ArrayList;
 
 public class Repositorio<T extends Identificable>{
+    /**
+     * Colección genérica de elementos identificables.
+     * Permite agregar, eliminar, buscar por id y listar cualquier tipo
+     * que implemente Identificable (Paciente, Medico, Turno).
+     *
+     * @param <T> tipo de elemento que guarda
+     */
 
     private ArrayList<T> elementos;
 

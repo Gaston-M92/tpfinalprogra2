@@ -4,7 +4,13 @@ import Enums.Especialidad;
 
 import java.util.ArrayList;
 
+
 public class Medico extends Persona{
+    /**
+     * Representa a un médico del consultorio.
+     * Hereda los datos personales de Persona y agrega matrícula,
+     * especialidad, duración de turno y sus horarios de atención.
+     */
     private String matricula;
     private Especialidad especialidad;
     private int duracionTurnoMin;
@@ -50,9 +56,7 @@ public class Medico extends Persona{
         this.horarios = horarios;
     }
 
-    /**
-     * Utiliza generarFicha por parte de la clase Paciente.
-     */
+
     @Override
     public String generarFicha() {
         return "MÉDICO - " + getApellido() + ", " + getNombre()

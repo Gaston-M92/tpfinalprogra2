@@ -38,9 +38,7 @@ public class Paciente extends Persona {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    /**
-     * Utiliza generarFicha por parte de la clase Paciente.
-     */
+
     @Override
     public String generarFicha() {
         return "PACIENTE - " + getApellido() + ", " + getNombre()
