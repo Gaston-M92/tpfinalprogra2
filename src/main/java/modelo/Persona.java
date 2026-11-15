@@ -50,6 +50,8 @@ public abstract class Persona implements Identificable {
         this.telefono = telefono;
     }
 
+    public abstract String generarFicha();
+
     @Override
     public String getId() {
         return dni;

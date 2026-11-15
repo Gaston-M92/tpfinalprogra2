@@ -49,4 +49,14 @@ public class Medico extends Persona{
     public void setHorarios(ArrayList<HorarioAtencion> horarios) {
         this.horarios = horarios;
     }
+
+    @Override
+    public String generarFicha() {
+        return "MÉDICO - " + getApellido() + ", " + getNombre()
+                + " | DNI: " + getDni()
+                + " | Matrícula: " + matricula
+                + " | Especialidad: " + especialidad;
+    }
 }
+
+

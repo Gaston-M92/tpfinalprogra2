@@ -2,7 +2,7 @@ package modelo;
 
 import java.time.LocalDate;
 
-public class Paciente extends Persona{
+public class Paciente extends Persona {
     private int historiaClinica;
     private String obraSocial;
     private LocalDate fechaNacimiento;
@@ -37,4 +37,13 @@ public class Paciente extends Persona{
     public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
+
+    @Override
+    public String generarFicha() {
+        return "PACIENTE - " + getApellido() + ", " + getNombre()
+                + " | DNI: " + getDni()
+                + " | HC: " + historiaClinica
+                + " | Obra social: " + obraSocial;
+    }
+
 }
