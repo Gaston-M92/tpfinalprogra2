@@ -79,5 +79,21 @@ public class Turno implements Identificable {
         this.estado = estado;
     }
 
+    /**
+     * Verifica si este turno se superpone con otro turno.
+     *
+     * @param otro turno con el que se desea comparar.
+     * @return true si los turnos se superponen, false en caso contrario.
+     */
+    public boolean seSuperponeCon(Turno otro) {
+        LocalDateTime inicio1 = this.fechaHora;
+        LocalDateTime fin1 = inicio1.plusMinutes(this.medico.getDuracionTurnoMin());
+
+        LocalDateTime inicio2 = otro.fechaHora;
+        LocalDateTime fin2 = inicio2.plusMinutes(otro.medico.getDuracionTurnoMin());
+
+        return inicio1.isBefore(fin2) && inicio2.isBefore(fin1);
+    }
+
 
 }

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import Enums.Especialidad;
+import Enums.EstadoTurno;
+import Exceptions.HorarioNoDisponibleException;
 import Exceptions.PacienteNoEncontradoException;
 import Exceptions.TurnoNoCancelableException;
 import Exceptions.TurnoSuperpuestoException;
@@ -42,12 +44,21 @@ public class GestorTurnos implements Reportable {
 
     }
 
-    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoNoCancelableException, TurnoSuperpuestoException {
+    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException {
         if(pacientes.buscarPorId(dni) == null){
             throw new PacienteNoEncontradoException(dni);
         }
-        if(m.ati)
-
+        if(!m.atiendeEn(fechaHora)){
+            throw new HorarioNoDisponibleException(dni);
+        }
+        Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
+        for (Turno t : turnos.listar()) {
+            if (t.getEstado() != EstadoTurno.CANCELADO && t.seSuperponeCon(nuevoTurno)) {
+                throw new TurnoSuperpuestoException("El turno ya esta superpuesto");
+            }
+        }
+        turnos.agregar(nuevoTurno);
+        return nuevoTurno;
     }
 
     public void cancelarTurno(String idTurno) throws TurnoNoCancelableException{
