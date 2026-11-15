@@ -42,7 +42,7 @@ UNIQUE (matricula)
 -- Relaciona un paciente con un medico en una fecha y hora
 
 CREATE TABLE IF NOT EXISTS turnos (
-id_turno VARCHAR(20) NOT NULL,
+id_turno     VARCHAR(36) NOT NULL,
 dni_paciente VARCHAR(10) NOT NULL,
 dni_medico VARCHAR(10) NOT NULL,
 fecha_hora DATETIME NOT NULL,
