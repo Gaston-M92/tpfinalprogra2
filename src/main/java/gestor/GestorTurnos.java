@@ -4,6 +4,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.sql.SQLException;
+import java.time.DayOfWeek;
+import dao.MedicoDAO;
+import dao.PacienteDAO;
+import dao.TurnoDAO;
 
 import Enums.Especialidad;
 import Enums.EstadoTurno;
@@ -20,6 +25,9 @@ public class GestorTurnos implements Reportable {
     private Gestor<Medico> medicos;
     private Gestor<Turno> turnos;
     private ArrayList<Consultorio> consultorios;
+    private final PacienteDAO pacienteDAO = new PacienteDAO();
+    private final MedicoDAO medicoDAO = new MedicoDAO();
+    private final TurnoDAO turnoDAO = new TurnoDAO();
 
     public GestorTurnos() {
         pacientes = new Gestor<>();
@@ -28,9 +36,81 @@ public class GestorTurnos implements Reportable {
         consultorios = new ArrayList<>();
     }
 
-    public void registrarPaciente(Paciente p) {
+    /**
+     * Carga los datos al iniciar el sistema.
+     * Pacientes, medicos y turnos se leen de la base de datos,
+     * los consultorios y los horarios de atencion se crean en memoria.
+     */
+
+    public void cargarDatos() throws SQLException {
+        Consultorio c1 = new Consultorio(1, 1);
+        Consultorio c2 = new Consultorio(2, 1);
+        Consultorio c3 = new Consultorio(3, 2);
+        consultorios.add(c1);
+        consultorios.add(c2);
+        consultorios.add(c3);
+
+        for (Paciente p : pacienteDAO.listarTodos()) {
+            pacientes.agregar(p);
+        }
+
+        for (Medico m : medicoDAO.listarTodos()) {
+            asignarHorarios(m);
+            medicos.agregar(m);
+        }
+
+        //Se rearma cada turno con el paciente y el medico ya cargados en memoria, para que todo el sistema comparta los mismos objetos.
+
+        for (Turno t : turnoDAO.listarTodos()) {
+            Paciente p = pacientes.buscarPorId(t.getPaciente().getDni());
+            Medico m = medicos.buscarPorId(t.getMedico().getDni());
+            turnos.agregar(new Turno(t.getId(), p, m, t.getFechaHora(), t.getMotivoConsulta(), t.getEstado()));
+        }
+    }
+
+        /**
+         * Asigna los horarios de atencion a un medico (se manejan en memoria).
+         * Los medicos de ejemplo tienen horarios propios, el resto atiende
+         * de lunes a viernes de 9 a 13 en el consultorio 1.
+         */
+        private void asignarHorarios(Medico m) {
+            Consultorio c1 = consultorios.get(0);
+            Consultorio c2 = consultorios.get(1);
+            Consultorio c3 = consultorios.get(2);
+
+        switch (m.getDni()) {
+            case "20123456" -> { // Carlos Fernandez - Clinica medica
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(12, 0), c1));
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.WEDNESDAY, LocalTime.of(14, 0), LocalTime.of(18, 0), c1));
+            }
+            case "25987654" -> { // Ana Lopez - Pediatria
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.TUESDAY, LocalTime.of(8, 0), LocalTime.of(12, 0), c2));
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.WEDNESDAY, LocalTime.of(10, 0), LocalTime.of(13, 0), c2));
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.THURSDAY, LocalTime.of(8, 0), LocalTime.of(12, 0), c2));
+            }
+            case "28456789" -> { // Jorge Martinez - Cardiologia
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.TUESDAY, LocalTime.of(9, 0), LocalTime.of(13, 0), c3));
+                m.agregarHorario(new HorarioAtencion(DayOfWeek.FRIDAY, LocalTime.of(9, 0), LocalTime.of(13, 0), c3));
+            }
+            default -> {
+                for (DayOfWeek dia : new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
+                        DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY}) {
+                    m.agregarHorario(new HorarioAtencion(dia, LocalTime.of(9, 0), LocalTime.of(13, 0), c1));
+                }
+            }
+        }
+    }
+
+    /**
+     * Registra un paciente nuevo: primero lo guarda en la base y, si no hay error, lo agrega en memoria.
+     */
+
+    public void registrarPaciente(Paciente p) throws SQLException {
+        pacienteDAO.insertar(p);
         pacientes.agregar(p);
     }
+
+
 
     public Paciente buscarPaciente(String dni) throws PacienteNoEncontradoException {
         Paciente p = pacientes.buscarPorId(dni);
@@ -81,40 +161,60 @@ public class GestorTurnos implements Reportable {
     }
 
     /**
-     * Asigna un turno nuevo a un paciente con un medico.
-     * Valida que el paciente exista, que el medico atienda en ese horario
-     * y que ni el medico ni el paciente tengan otro turno que se superponga.
-     *
-     * @throws PacienteNoEncontradoException si no existe un paciente con ese DNI
-     * @throws HorarioNoDisponibleException si el medico no atiende en ese dia y horario
-     * @throws TurnoSuperpuestoException si el medico o el paciente ya tienen un turno en ese horario
-     */
+         * Asigna un turno nuevo a un paciente con un medico.
+         * Valida que el paciente exista, que el medico atienda en ese horario
+         * y que ni el medico ni el paciente tengan otro turno que se superponga.
+         *
+         * @throws PacienteNoEncontradoException si no existe un paciente con ese DNI
+         * @throws HorarioNoDisponibleException si el medico no atiende en ese dia y horario
+         * @throws TurnoSuperpuestoException si el medico o el paciente ya tienen un turno en ese horario
+         * @throws SQLException si falla el guardado en la base de datos
+         */
 
-    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException{
-        Paciente p = buscarPaciente(dni);
+        public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException, SQLException {
+            Paciente p = buscarPaciente(dni);
 
-        if(!m.atiendeEn(fechaHora)){
-            throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto() + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
-        }
-
-        Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
-
-        for(Turno t : turnos.listar()){
-            if(t.getEstado() == EstadoTurno.CANCELADO || !t.seSuperponeCon(nuevoTurno)){
-                continue;
+            if (!m.atiendeEn(fechaHora)) {
+                throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto() + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
             }
-            if(t.getMedico().getDni().equals(m.getDni())){
-                throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto() + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
+
+            Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
+
+            for (Turno t : turnos.listar()) {
+                if (t.getEstado() == EstadoTurno.CANCELADO) {
+                    continue;
+                }
+                if (t.seSuperponeCon(nuevoTurno)) {
+                    throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto() + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
+                }
+                if (t.getPaciente().getDni().equals(dni) && horariosSeSolapan(t, nuevoTurno)) {
+                    throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto() + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
+                }
             }
-            if(t.getPaciente().getDni().equals(dni)){
-                throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto() + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
-            }
-        }
-        turnos.agregar(nuevoTurno);
-        return nuevoTurno;
+
+            turnoDAO.insertar(nuevoTurno);
+            turnos.agregar(nuevoTurno);
+
+            return nuevoTurno;
     }
 
-    public void cancelarTurno(String idTurno) throws TurnoNoCancelableException {
+    /**
+     * Indica si los horarios de dos turnos se pisan, sin importar el medico.
+     * Se usa para validar que un paciente no tenga dos turnos al mismo tiempo.
+     */
+
+    private boolean horariosSeSolapan(Turno a, Turno b){
+        LocalDateTime finA = a.getFechaHora().plusMinutes(a.getMedico().getDuracionTurnoMin());
+        LocalDateTime finB = b.getFechaHora().plusMinutes(b.getMedico().getDuracionTurnoMin());
+        return a.getFechaHora().isBefore(finB) && b.getFechaHora().isBefore(finA);
+    }
+
+    /**
+     * Cancela un turno reservado y guarda el cambio en la base.
+     * Si la base falla, el turno vuelve a quedar RESERVADO en memoria.
+     */
+
+    public void cancelarTurno(String idTurno) throws TurnoNoCancelableException, SQLException {
 
         Turno t = turnos.buscarPorId(idTurno);
 
@@ -127,6 +227,12 @@ public class GestorTurnos implements Reportable {
         }
 
         t.cancelar();
+        try{
+            turnoDAO.actualizar(t);
+        }catch(SQLException e){
+            t.setEstado(EstadoTurno.RESERVADO);
+            throw e;
+        }
     }
 
     /**
