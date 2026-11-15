@@ -179,6 +179,14 @@ public class GestorTurnos implements Reportable {
                     break;
             }
         }
+        String reporte = "REPORTE ESTADÍSTICO\n"
+                + "Total de turnos: " + turnos.cantidad() + "\n"
+                + "Reservados: " + reservados + "\n"
+                + "Atendidos: " + atendidos + "\n"
+                + "Cancelados: " + cancelados + "\n"
+                + "Ausentes: " + ausentes;
+
+        return reporte;
     }
 
 
