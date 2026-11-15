@@ -5,6 +5,11 @@ import Interfaces.Identificable;
 
 import java.time.LocalDateTime;
 
+/**
+ * Representa un turno médico del consultorio.
+ * Relaciona un paciente con un médico en una fecha y hora determinada.
+ * Almacena el motivo de consulta y el estado actual del turno.
+ */
 public class Turno implements Identificable {
     private String id;
     private Paciente paciente;
@@ -13,6 +18,10 @@ public class Turno implements Identificable {
     private String motivoConsulta;
     private EstadoTurno  estado;
 
+    /**
+     * Crea un turno con su identificador, paciente, médico,
+     * fecha y hora, motivo de consulta y estado inicial.
+     */
     public Turno(String id, Paciente paciente, Medico medico, LocalDateTime fechaHora, String motivoConsulta, EstadoTurno estado) {
         this.id = id;
         this.paciente = paciente;

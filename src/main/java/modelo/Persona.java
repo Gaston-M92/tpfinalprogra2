@@ -2,6 +2,11 @@ package modelo;
 
 import Interfaces.Identificable;
 
+/**
+ * Clase abstracta que representa los datos comunes de una persona.
+ * Implementa Identificable utilizando el DNI como identificador.
+ * Es la clase padre de Paciente y Medico.
+ */
 public abstract class Persona implements Identificable {
     private String nombre;
     private String apellido;

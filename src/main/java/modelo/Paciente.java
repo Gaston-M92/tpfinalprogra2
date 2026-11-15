@@ -2,6 +2,11 @@ package modelo;
 
 import java.time.LocalDate;
 
+/**
+ * Representa a un paciente del consultorio.
+ * Hereda los datos personales de Persona y agrega
+ * su número de historia clínica, obra social y fecha de nacimiento.
+ */
 public class Paciente extends Persona {
     private int historiaClinica;
     private String obraSocial;
@@ -38,7 +43,11 @@ public class Paciente extends Persona {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-
+    /**
+     * Genera una ficha con los datos personales y médicos del paciente.
+     *
+     * @return cadena con la información principal del paciente.
+     */
     @Override
     public String generarFicha() {
         return "PACIENTE - " + getApellido() + ", " + getNombre()

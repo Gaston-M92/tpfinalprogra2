@@ -3,12 +3,21 @@ package modelo;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
+/**
+ * Representa el horario de atención de un médico.
+ * Almacena el día de la semana, la hora de inicio y finalización
+ * de la atención y el consultorio asignado.
+ */
 public class HorarioAtencion {
     private DayOfWeek dia;
     private LocalTime horaInicio;
     private LocalTime horaFin;
     private Consultorio consultorio;
 
+    /**
+     * Crea un horario de atención con el día, horario de inicio,
+     * horario de finalización y consultorio correspondiente.
+     */
     public HorarioAtencion(DayOfWeek dia, LocalTime horaInicio, LocalTime horaFin, Consultorio consultorio) {
         this.dia = dia;
         this.horaInicio = horaInicio;
