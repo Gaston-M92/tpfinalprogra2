@@ -34,7 +34,7 @@ public class GestorTurnos implements Reportable {
     public Paciente buscarPaciente(String dni) throws PacienteNoEncontradoException {
         Paciente p = pacientes.buscarPorId(dni);
 
-        if(p == null){
+        if (p == null) {
             throw new PacienteNoEncontradoException(dni);
         }
 
@@ -104,90 +104,93 @@ public class GestorTurnos implements Reportable {
 
                             for (Turno t : turnos.listar()) {
 
-                                if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m) && t.getFechaHora().toLocalDate().equals(fecha)) {{
+                                if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m) && t.getFechaHora().toLocalDate().equals(fecha)) {
+                                    {
 
-                                    LocalDateTime inicioExistente = t.getFechaHora();
-                                    LocalDateTime finExistente = inicioExistente.plusMinutes(t.getMedico().getDuracionTurnoMin());
+                                        LocalDateTime inicioExistente = t.getFechaHora();
+                                        LocalDateTime finExistente = inicioExistente.plusMinutes(t.getMedico().getDuracionTurnoMin());
 
-                                    if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
-                                        disponible = false;
-                                        break;
+                                        if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
+                                            disponible = false;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (disponible && !horariosLibres.contains(inicioNuevo)) {
-                                horariosLibres.add(inicioNuevo);
-                            }
+                                if (disponible && !horariosLibres.contains(inicioNuevo)) {
+                                    horariosLibres.add(inicioNuevo);
+                                }
 
-                            hora = hora.plusMinutes(m.getDuracionTurnoMin());
+                                hora = hora.plusMinutes(m.getDuracionTurnoMin());
+                            }
                         }
                     }
                 }
             }
-        }
 
+        }
         return horariosLibres;
     }
 
-    public ArrayList<Turno> listarTurnosPorMedico(Medico m, LocalDate fecha){
-        ArrayList<Turno> lista = new ArrayList<>();
+        public ArrayList<Turno> listarTurnosPorMedico (Medico m, LocalDate fecha){
+            ArrayList<Turno> lista = new ArrayList<>();
 
-        for (Turno t : turnos.listar()) {
-            if (t.getMedico().equals(m)
-                    && t.getFechaHora().toLocalDate().equals(fecha)) {
-                lista.add(t);
+            for (Turno t : turnos.listar()) {
+                if (t.getMedico().equals(m)
+                        && t.getFechaHora().toLocalDate().equals(fecha)) {
+                    lista.add(t);
+                }
             }
+
+            return lista;
+
         }
 
-        return lista;
+        public ArrayList<Turno> listarTurnosPorPaciente (String dni){
+            ArrayList<Turno> lista = new ArrayList<>();
 
-    }
-
-    public ArrayList<Turno> listarTurnosPorPaciente(String dni){
-        ArrayList<Turno> lista = new ArrayList<>();
-
-        for (Turno t : turnos.listar()) {
-            if (t.getPaciente().getDni().equals(dni)) {
-                lista.add(t);
+            for (Turno t : turnos.listar()) {
+                if (t.getPaciente().getDni().equals(dni)) {
+                    lista.add(t);
+                }
             }
+            return lista;
+
         }
-        return lista;
-
-    }
 
 
-    @Override
-    public String generarReporteEstadistico() {
-        int reservados = 0;
-        int atendidos = 0;
-        int cancelados = 0;
-        int ausentes = 0;
-        for (Turno t : turnos.listar()) {
-            switch (t.getEstado()) {
-                case RESERVADO:
-                    reservados++;
-                    break;
-                case ATENDIDO:
-                    atendidos++;
-                    break;
-                case CANCELADO:
-                    cancelados++;
-                    break;
-                case AUSENTE:
-                    ausentes++;
-                    break;
+
+        @Override
+        public String generarReporteEstadistico () {
+            int reservados = 0;
+            int atendidos = 0;
+            int cancelados = 0;
+            int ausentes = 0;
+            for (Turno t : turnos.listar()) {
+                switch (t.getEstado()) {
+                    case RESERVADO:
+                        reservados++;
+                        break;
+                    case ATENDIDO:
+                        atendidos++;
+                        break;
+                    case CANCELADO:
+                        cancelados++;
+                        break;
+                    case AUSENTE:
+                        ausentes++;
+                        break;
+                }
             }
+            String reporte = "REPORTE ESTADÍSTICO\n"
+                    + "Total de turnos: " + turnos.cantidad() + "\n"
+                    + "Reservados: " + reservados + "\n"
+                    + "Atendidos: " + atendidos + "\n"
+                    + "Cancelados: " + cancelados + "\n"
+                    + "Ausentes: " + ausentes;
+
+            return reporte;
         }
-        String reporte = "REPORTE ESTADÍSTICO\n"
-                + "Total de turnos: " + turnos.cantidad() + "\n"
-                + "Reservados: " + reservados + "\n"
-                + "Atendidos: " + atendidos + "\n"
-                + "Cancelados: " + cancelados + "\n"
-                + "Ausentes: " + ausentes;
 
-        return reporte;
+
     }
-
-
-}
