@@ -1,6 +1,7 @@
 package gestor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import Enums.Especialidad;
@@ -10,10 +11,7 @@ import Exceptions.PacienteNoEncontradoException;
 import Exceptions.TurnoNoCancelableException;
 import Exceptions.TurnoSuperpuestoException;
 import Interfaces.Reportable;
-import modelo.Consultorio;
-import modelo.Medico;
-import modelo.Paciente;
-import modelo.Turno;
+import modelo.*;
 
 
 public class GestorTurnos implements Reportable {
@@ -45,18 +43,26 @@ public class GestorTurnos implements Reportable {
     }
 
     public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException {
-        if(pacientes.buscarPorId(dni) == null){
+
+        Paciente p = pacientes.buscarPorId(dni);
+
+        if (p == null) {
             throw new PacienteNoEncontradoException(dni);
         }
-        if(!m.atiendeEn(fechaHora)){
+
+        if (!m.atiendeEn(fechaHora)) {
             throw new HorarioNoDisponibleException(dni);
         }
+
         Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
+
         for (Turno t : turnos.listar()) {
-            if (t.getEstado() != EstadoTurno.CANCELADO && t.seSuperponeCon(nuevoTurno)) {
+            if (t.getEstado() != EstadoTurno.CANCELADO
+                    && t.seSuperponeCon(nuevoTurno)) {
                 throw new TurnoSuperpuestoException("El turno ya esta superpuesto");
             }
         }
+
         turnos.agregar(nuevoTurno);
         return nuevoTurno;
     }
@@ -75,8 +81,53 @@ public class GestorTurnos implements Reportable {
         t.setEstado(EstadoTurno.CANCELADO);
     }
 
-    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha){
+    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha) {
 
+        ArrayList<LocalDateTime> horariosLibres = new ArrayList<>();
+
+        for (Medico m : medicos.listar()) {
+
+            if (m.getEspecialidad() == especialidad) {
+
+                for (HorarioAtencion h : m.getHorarios()) {
+
+                    if (h.getDia() == fecha.getDayOfWeek()) {
+
+                        LocalTime hora = h.getHoraInicio();
+
+                        while (!hora.plusMinutes(m.getDuracionTurnoMin()).isAfter(h.getHoraFin())) {
+
+                            LocalDateTime inicioNuevo = fecha.atTime(hora);
+                            LocalDateTime finNuevo = inicioNuevo.plusMinutes(m.getDuracionTurnoMin());
+
+                            boolean disponible = true;
+
+                            for (Turno t : turnos.listar()) {
+
+                                if (t.getEstado() != EstadoTurno.CANCELADO && t.getMedico().equals(m)) {
+
+                                    LocalDateTime inicioExistente = t.getFechaHora();
+                                    LocalDateTime finExistente = inicioExistente.plusMinutes(t.getMedico().getDuracionTurnoMin());
+
+                                    if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
+                                        disponible = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (disponible) {
+                                horariosLibres.add(inicioNuevo);
+                            }
+
+                            hora = hora.plusMinutes(m.getDuracionTurnoMin());
+                        }
+                    }
+                }
+            }
+        }
+
+        return horariosLibres;
     }
 
     public ArrayList<Turno> listarTurnosPorMedico(Medico m, LocalDate fecha){
