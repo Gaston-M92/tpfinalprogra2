@@ -103,6 +103,7 @@ public class Turno implements Identificable, Comparable<Turno>{
         this.estado = EstadoTurno.CANCELADO;
     }
 
+<<<<<<< Updated upstream
     public void marcarAtendido() {
         this.estado = EstadoTurno.ATENDIDO;
     }
@@ -133,4 +134,8 @@ public class Turno implements Identificable, Comparable<Turno>{
     public int compareTo(Turno otro) {
         return this.fechaHora.compareTo(otro.fechaHora);
     }
+=======
+
+
+>>>>>>> Stashed changes
 }
