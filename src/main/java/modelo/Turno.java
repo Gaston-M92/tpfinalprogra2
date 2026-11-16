@@ -116,19 +116,11 @@ public class Turno implements Identificable, Comparable<Turno> {
 
     /**
      * Verifica si este turno se superpone con otro turno.
-     * Solo hay superposición si son del mismo médico, ninguno está
-     * cancelado y sus horarios se solapan.
      *
      * @param otro turno con el que se desea comparar.
      * @return true si los turnos se superponen, false en caso contrario.
      */
     public boolean seSuperponeCon(Turno otro) {
-        if (!this.medico.equals(otro.medico)
-                || this.estado == EstadoTurno.CANCELADO
-                || otro.estado == EstadoTurno.CANCELADO) {
-            return false;
-        }
-
         LocalDateTime inicio1 = this.fechaHora;
         LocalDateTime fin1 = inicio1.plusMinutes(
                 this.medico.getDuracionTurnoMin());
