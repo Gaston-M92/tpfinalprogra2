@@ -24,7 +24,6 @@ import modelo.*;
  * Aplica las reglas de negocio (horarios de atencion, superposicion de turnos,
  * cancelaciones) y usa los DAO para guardar y cargar los datos desde MySQL.
  */
-
 public class GestorTurnos implements Reportable {
     private Gestor<Paciente> pacientes;
     private Gestor<Medico> medicos;
@@ -73,15 +72,15 @@ public class GestorTurnos implements Reportable {
         }
     }
 
-        /**
-         * Asigna los horarios de atencion a un medico (se manejan en memoria).
-         * Los medicos de ejemplo tienen horarios propios, el resto atiende
-         * de lunes a viernes de 9 a 13 en el consultorio 1.
-         */
-        private void asignarHorarios(Medico m) {
-            Consultorio c1 = consultorios.get(0);
-            Consultorio c2 = consultorios.get(1);
-            Consultorio c3 = consultorios.get(2);
+    /**
+     * Asigna los horarios de atencion a un medico (se manejan en memoria).
+     * Los medicos de ejemplo tienen horarios propios, el resto atiende
+     * de lunes a viernes de 9 a 13 en el consultorio 1.
+     */
+    private void asignarHorarios(Medico m) {
+        Consultorio c1 = consultorios.get(0);
+        Consultorio c2 = consultorios.get(1);
+        Consultorio c3 = consultorios.get(2);
 
         switch (m.getDni()) {
             case "20123456" -> { // Carlos Fernandez - Clinica medica
@@ -116,7 +115,6 @@ public class GestorTurnos implements Reportable {
     }
 
 
-
     public Paciente buscarPaciente(String dni) throws PacienteNoEncontradoException {
         Paciente p = pacientes.buscarPorId(dni);
 
@@ -131,11 +129,10 @@ public class GestorTurnos implements Reportable {
     /**
      * Registra un medico en el sistema
      *
-
      * @param m medico a registrar
      */
 
-    public void registrarMedico(Medico m){
+    public void registrarMedico(Medico m) {
         medicos.agregar(m);
     }
 
@@ -143,7 +140,7 @@ public class GestorTurnos implements Reportable {
      * Busca un medico por su DNI
      */
 
-    public Medico buscarMedico(String dni){
+    public Medico buscarMedico(String dni) {
         return medicos.buscarPorId(dni);
     }
 
@@ -151,7 +148,7 @@ public class GestorTurnos implements Reportable {
      * Devuelve todos los pacientes ordenados por apellido y nombre
      */
 
-    public ArrayList<Paciente> listarPacientes(){
+    public ArrayList<Paciente> listarPacientes() {
         ArrayList<Paciente> lista = pacientes.listar();
         Collections.sort(lista);
         return lista;
@@ -161,46 +158,46 @@ public class GestorTurnos implements Reportable {
      * Devuelve todos los medicos registrados
      */
 
-    public ArrayList<Medico> listarMedicos(){
+    public ArrayList<Medico> listarMedicos() {
         return medicos.listar();
     }
 
     /**
-         * Asigna un turno nuevo a un paciente con un medico.
-         * Valida que el paciente exista, que el medico atienda en ese horario
-         * y que ni el medico ni el paciente tengan otro turno que se superponga.
-         *
-         * @throws PacienteNoEncontradoException si no existe un paciente con ese DNI
-         * @throws HorarioNoDisponibleException si el medico no atiende en ese dia y horario
-         * @throws TurnoSuperpuestoException si el medico o el paciente ya tienen un turno en ese horario
-         * @throws SQLException si falla el guardado en la base de datos
-         */
+     * Asigna un turno nuevo a un paciente con un medico.
+     * Valida que el paciente exista, que el medico atienda en ese horario
+     * y que ni el medico ni el paciente tengan otro turno que se superponga.
+     *
+     * @throws PacienteNoEncontradoException si no existe un paciente con ese DNI
+     * @throws HorarioNoDisponibleException  si el medico no atiende en ese dia y horario
+     * @throws TurnoSuperpuestoException     si el medico o el paciente ya tienen un turno en ese horario
+     * @throws SQLException                  si falla el guardado en la base de datos
+     */
 
-        public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException, SQLException {
-            Paciente p = buscarPaciente(dni);
+    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException, SQLException {
+        Paciente p = buscarPaciente(dni);
 
-            if (!m.atiendeEn(fechaHora)) {
-                throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto() + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
+        if (!m.atiendeEn(fechaHora)) {
+            throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto() + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
+        }
+
+        Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
+
+        for (Turno t : turnos.listar()) {
+            if (t.getEstado() == EstadoTurno.CANCELADO) {
+                continue;
             }
-
-            Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
-
-            for (Turno t : turnos.listar()) {
-                if (t.getEstado() == EstadoTurno.CANCELADO) {
-                    continue;
-                }
-                if (t.seSuperponeCon(nuevoTurno)) {
-                    throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto() + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
-                }
-                if (t.getPaciente().getDni().equals(dni) && horariosSeSolapan(t, nuevoTurno)) {
-                    throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto() + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
-                }
+            if (t.seSuperponeCon(nuevoTurno)) {
+                throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto() + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
             }
+            if (t.getPaciente().getDni().equals(dni) && horariosSeSolapan(t, nuevoTurno)) {
+                throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto() + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
+            }
+        }
 
-            turnoDAO.insertar(nuevoTurno);
-            turnos.agregar(nuevoTurno);
+        turnoDAO.insertar(nuevoTurno);
+        turnos.agregar(nuevoTurno);
 
-            return nuevoTurno;
+        return nuevoTurno;
     }
 
     /**
@@ -208,7 +205,7 @@ public class GestorTurnos implements Reportable {
      * Se usa para validar que un paciente no tenga dos turnos al mismo tiempo.
      */
 
-    private boolean horariosSeSolapan(Turno a, Turno b){
+    private boolean horariosSeSolapan(Turno a, Turno b) {
         LocalDateTime finA = a.getFechaHora().plusMinutes(a.getMedico().getDuracionTurnoMin());
         LocalDateTime finB = b.getFechaHora().plusMinutes(b.getMedico().getDuracionTurnoMin());
         return a.getFechaHora().isBefore(finB) && b.getFechaHora().isBefore(finA);
@@ -232,9 +229,9 @@ public class GestorTurnos implements Reportable {
         }
 
         t.cancelar();
-        try{
+        try {
             turnoDAO.actualizar(t);
-        }catch(SQLException e){
+        } catch (SQLException e) {
             t.setEstado(EstadoTurno.RESERVADO);
             throw e;
         }
@@ -246,42 +243,42 @@ public class GestorTurnos implements Reportable {
      * segun la duracion de turno, y descarta las franjas ocupadas por turnos no cancelados.
      *
      * @param especialidad especialidad buscada
-     * @param fecha dia para el que se buscan horarios
+     * @param fecha        dia para el que se buscan horarios
      * @return lista de fechas y horas disponibles, ordenada
      */
 
-    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha){
+    public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha) {
         ArrayList<LocalDateTime> horariosLibres = new ArrayList<>();
 
-        for(Medico m : medicos.listar()){
+        for (Medico m : medicos.listar()) {
             int duracion = m.getDuracionTurnoMin();
-            if(m.getEspecialidad() != especialidad || duracion <= 0){
+            if (m.getEspecialidad() != especialidad || duracion <= 0) {
                 continue;
             }
 
-            for(HorarioAtencion h : m.getHorarios()){
-                if(h.getDia() != fecha.getDayOfWeek()){
+            for (HorarioAtencion h : m.getHorarios()) {
+                if (h.getDia() != fecha.getDayOfWeek()) {
                     continue;
                 }
 
                 LocalTime hora = h.getHoraInicio();
-                while(!hora.plusMinutes(duracion).isAfter(h.getHoraFin())){
+                while (!hora.plusMinutes(duracion).isAfter(h.getHoraFin())) {
                     LocalDateTime inicioNuevo = fecha.atTime(hora);
                     LocalDateTime finNuevo = inicioNuevo.plusMinutes(duracion);
 
                     boolean disponible = true;
-                    for(Turno t : turnos.listar()){
+                    for (Turno t : turnos.listar()) {
                         boolean mismoMedico = t.getMedico().getDni().equals(m.getDni());
-                        if(mismoMedico && t.getEstado() != EstadoTurno.CANCELADO){
+                        if (mismoMedico && t.getEstado() != EstadoTurno.CANCELADO) {
                             LocalDateTime inicioExistente = t.getFechaHora();
                             LocalDateTime finExistente = inicioExistente.plusMinutes(duracion);
-                            if(inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)){
+                            if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
                                 disponible = false;
                                 break;
                             }
                         }
                     }
-                    if(disponible && !horariosLibres.contains(inicioNuevo)){
+                    if (disponible && !horariosLibres.contains(inicioNuevo)) {
                         horariosLibres.add(inicioNuevo);
                     }
                     hora = hora.plusMinutes(duracion);
@@ -297,10 +294,10 @@ public class GestorTurnos implements Reportable {
      * Devuelve los turnos de un medico en una fecha, ordenados por hora.
      */
 
-    public ArrayList<Turno> listarTurnosPorMedico(Medico medico,  LocalDate fecha){
+    public ArrayList<Turno> listarTurnosPorMedico(Medico medico, LocalDate fecha) {
         ArrayList<Turno> lista = new ArrayList<>();
-        for(Turno t : turnos.listar()){
-            if(t.getMedico().getDni().equals(medico.getDni()) && t.getFechaHora().toLocalDate().equals(fecha)){
+        for (Turno t : turnos.listar()) {
+            if (t.getMedico().getDni().equals(medico.getDni()) && t.getFechaHora().toLocalDate().equals(fecha)) {
                 lista.add(t);
             }
         }
@@ -312,10 +309,10 @@ public class GestorTurnos implements Reportable {
      * Devuelve todos los turnos de un paciente, ordenados por fecha y hora.
      */
 
-    public ArrayList<Turno> listarTurnosPorPaciente(String dni){
+    public ArrayList<Turno> listarTurnosPorPaciente(String dni) {
         ArrayList<Turno> lista = new ArrayList<>();
-        for(Turno t : turnos.listar()){
-            if(t.getPaciente().getDni().equals(dni)){
+        for (Turno t : turnos.listar()) {
+            if (t.getPaciente().getDni().equals(dni)) {
                 lista.add(t);
             }
         }
@@ -323,37 +320,42 @@ public class GestorTurnos implements Reportable {
         return lista;
     }
 
-        @Override
-        public String generarReporteEstadistico () {
-            int reservados = 0;
-            int atendidos = 0;
-            int cancelados = 0;
-            int ausentes = 0;
-            for (Turno t : turnos.listar()) {
-                switch (t.getEstado()) {
-                    case RESERVADO:
-                        reservados++;
-                        break;
-                    case ATENDIDO:
-                        atendidos++;
-                        break;
-                    case CANCELADO:
-                        cancelados++;
-                        break;
-                    case AUSENTE:
-                        ausentes++;
-                        break;
-                }
+    /**
+     * Genera un reporte estadístico con la cantidad de turnos registrados
+     * en el sistema, separados según su estado: reservados, atendidos,
+     * cancelados y ausentes.
+     *
+     * @return un texto con el total de turnos y la cantidad correspondiente a cada estado
+     */
+    @Override
+    public String generarReporteEstadistico() {
+        int reservados = 0;
+        int atendidos = 0;
+        int cancelados = 0;
+        int ausentes = 0;
+        for (Turno t : turnos.listar()) {
+            switch (t.getEstado()) {
+                case RESERVADO:
+                    reservados++;
+                    break;
+                case ATENDIDO:
+                    atendidos++;
+                    break;
+                case CANCELADO:
+                    cancelados++;
+                    break;
+                case AUSENTE:
+                    ausentes++;
+                    break;
             }
-            String reporte = "REPORTE ESTADÍSTICO\n"
-                    + "Total de turnos: " + turnos.cantidad() + "\n"
-                    + "Reservados: " + reservados + "\n"
-                    + "Atendidos: " + atendidos + "\n"
-                    + "Cancelados: " + cancelados + "\n"
-                    + "Ausentes: " + ausentes;
-
-            return reporte;
         }
+        String reporte = "REPORTE ESTADÍSTICO\n"
+                + "Total de turnos: " + turnos.cantidad() + "\n"
+                + "Reservados: " + reservados + "\n"
+                + "Atendidos: " + atendidos + "\n"
+                + "Cancelados: " + cancelados + "\n"
+                + "Ausentes: " + ausentes;
 
-
+        return reporte;
     }
+}
