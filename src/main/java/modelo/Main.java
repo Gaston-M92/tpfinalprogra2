@@ -1,3 +1,5 @@
+package modelo;
+
 import Enums.Especialidad;
 import Exceptions.HorarioNoDisponibleException;
 import Exceptions.PacienteNoEncontradoException;
@@ -10,6 +12,7 @@ import modelo.Medico;
 import modelo.Paciente;
 import modelo.Turno;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,7 +36,7 @@ public class Main {
     private static final DateTimeFormatter FORMATO_FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         cargarDatosDePrueba();
 
         int opcion;
@@ -107,7 +110,7 @@ public class Main {
 
     // ---------- Opciones del menú ----------
 
-    private static void registrarPaciente() {
+    private static void registrarPaciente() throws SQLException {
         String dni = leerTexto("DNI: ");
 
         // Evita registrar dos pacientes con el mismo DNI
@@ -169,7 +172,7 @@ public class Main {
     }
 
     private static void asignarTurno() throws PacienteNoEncontradoException,
-            TurnoSuperpuestoException, HorarioNoDisponibleException {
+            TurnoSuperpuestoException, HorarioNoDisponibleException, SQLException {
         String dniPaciente = leerTexto("DNI del paciente: ");
         String dniMedico = leerTexto("DNI del médico: ");
 
@@ -186,7 +189,7 @@ public class Main {
         System.out.println("Turno asignado correctamente. ID: " + turno.getId());
     }
 
-    private static void cancelarTurno() throws TurnoNoCancelableException {
+    private static void cancelarTurno() throws TurnoNoCancelableException, SQLException {
         String id = leerTexto("ID del turno: ");
         gestor.cancelarTurno(id);
         System.out.println("Turno cancelado correctamente.");
@@ -264,7 +267,7 @@ public class Main {
 
     // ---------- Datos de prueba ----------
 
-    private static void cargarDatosDePrueba() {
+    private static void cargarDatosDePrueba() throws SQLException {
         Consultorio c1 = new Consultorio(1, 1);
         Consultorio c2 = new Consultorio(2, 1);
         Consultorio c3 = new Consultorio(3, 2);
