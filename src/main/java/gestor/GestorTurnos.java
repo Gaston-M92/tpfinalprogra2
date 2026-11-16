@@ -19,6 +19,11 @@ import Exceptions.TurnoSuperpuestoException;
 import Interfaces.Reportable;
 import modelo.*;
 
+/**
+ * Clase central del sistema: coordina pacientes, medicos y turnos.
+ * Aplica las reglas de negocio (horarios de atencion, superposicion de turnos,
+ * cancelaciones) y usa los DAO para guardar y cargar los datos desde MySQL.
+ */
 
 public class GestorTurnos implements Reportable {
     private Gestor<Paciente> pacientes;
