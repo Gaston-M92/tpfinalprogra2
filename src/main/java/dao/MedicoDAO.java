@@ -20,9 +20,6 @@ import java.util.List;
 public class MedicoDAO implements DAO<Medico> {
     /**
      * Guarda un medico nuevo en la base.
-     *
-     * @param medico medico a guardar
-     * @throws SQLException si el DNI o la matricula ya existen, o falla la conexion
      */
 
     @Override
@@ -43,9 +40,6 @@ public class MedicoDAO implements DAO<Medico> {
 
     /**
      * Actualiza los datos de un medico existente, identificado por su DNI.
-     *
-     * @param medico medico con los datos actualizados
-     * @throws SQLException si falla la conexion o la consulta
      */
 
     @Override
@@ -67,9 +61,6 @@ public class MedicoDAO implements DAO<Medico> {
 
     /**
      * Elimina un medico por su DNI.
-     *
-     * @param dni DNI del medico a eliminar
-     * @throws SQLException si el medico tiene turnos asociados (clave foranea) o falla la conexion
      */
 
     @Override
@@ -84,10 +75,6 @@ public class MedicoDAO implements DAO<Medico> {
 
     /**
      * Busca un medico por su DNI.
-     *
-     * @param dni DNI del medico
-     * @return el medico encontrado, o null si no existe
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public Medico buscarPorId(String dni) throws SQLException {
@@ -106,9 +93,6 @@ public class MedicoDAO implements DAO<Medico> {
 
     /**
      * Devuelve todos los medicos, ordenados por apellido y nombre.
-     *
-     * @return lista de medicos (vacia si no hay ninguno)
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public List<Medico> listarTodos() throws SQLException{

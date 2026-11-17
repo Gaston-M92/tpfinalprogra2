@@ -128,8 +128,6 @@ public class GestorTurnos implements Reportable {
 
     /**
      * Registra un medico en el sistema
-     *
-     * @param m medico a registrar
      */
 
     public void registrarMedico(Medico m) {
@@ -229,10 +227,6 @@ public class GestorTurnos implements Reportable {
      * Busca los horarios libres de todos los medicos de una especialidad en una fecha.
      * Recorre cada horario de atencion del medico para ese dia, lo divide en franjas
      * segun la duracion de turno, y descarta las franjas ocupadas por turnos no cancelados.
-     *
-     * @param especialidad especialidad buscada
-     * @param fecha        dia para el que se buscan horarios
-     * @return lista de fechas y horas disponibles, ordenada
      */
 
     public ArrayList<LocalDateTime> buscarHorariosLibres(Especialidad especialidad, LocalDate fecha) {
@@ -312,8 +306,6 @@ public class GestorTurnos implements Reportable {
      * Genera un reporte estadístico con la cantidad de turnos registrados
      * en el sistema, separados según su estado: reservados, atendidos,
      * cancelados y ausentes.
-     *
-     * @return un texto con el total de turnos y la cantidad correspondiente a cada estado
      */
     @Override
     public String generarReporteEstadistico() {

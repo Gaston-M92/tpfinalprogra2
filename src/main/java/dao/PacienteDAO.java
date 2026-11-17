@@ -19,9 +19,6 @@ import java.sql.Date;
 public class PacienteDAO implements DAO<Paciente> {
     /**
      * Guarda un paciente nuevo en la base.
-     *
-     * @param paciente paciente a guardar
-     * @throws SQLException si el DNI o la historia clinica ya existen
      */
 
     @Override
@@ -42,9 +39,6 @@ public class PacienteDAO implements DAO<Paciente> {
 
     /**
      * Actualiza los datos de un paciente existente, identificado por su DNI.
-     *
-     * @param paciente paciente con los datos actualizados
-     * @throws SQLException si falla la conexion o la consulta
      */
 
     @Override
@@ -66,9 +60,6 @@ public class PacienteDAO implements DAO<Paciente> {
 
     /**
      * Elimina un paciente por su DNI.
-     *
-     * @param dni DNI del paciente a eliminar
-     * @throws SQLException si el paciente tiene turnos asociados (clave foranea) o falla la conexion
      */
 
     @Override
@@ -83,10 +74,6 @@ public class PacienteDAO implements DAO<Paciente> {
 
     /**
      * Busca un paciente por su DNI.
-     *
-     * @param dni DNI del paciente
-     * @return el paciente encontrado, o null si no existe
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public Paciente buscarPorId(String dni) throws SQLException {
@@ -105,9 +92,6 @@ public class PacienteDAO implements DAO<Paciente> {
 
     /**
      * Devuelve todos los pacientes, ordenados por apellido y nombre.
-     *
-     * @return lista de pacientes (vacia si no hay ninguno)
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public List<Paciente> listarTodos() throws SQLException{

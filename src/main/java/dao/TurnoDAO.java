@@ -26,9 +26,6 @@ public class TurnoDAO implements DAO<Turno>{
 
     /**
      * Guarda un turno nuevo en la base.
-     *
-     * @param turno turno a guardar
-     * @throws SQLException si el id ya existe, el paciente o el medico no existen, o falla la conexion
      */
 
     @Override
@@ -50,9 +47,6 @@ public class TurnoDAO implements DAO<Turno>{
     /**
      * Actualiza un turno existente, identificado por su id.
      * Se usa, por ejemplo, para cancelarlo o marcarlo como atendido.
-     *
-     * @param turno turno con los datos actualizados
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public void actualizar (Turno turno) throws SQLException{
@@ -72,9 +66,6 @@ public class TurnoDAO implements DAO<Turno>{
 
     /**
      * Elimina un turno por su id
-     *
-     * @param id id del turno a eliminar
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public void eliminar(String id) throws SQLException{
@@ -88,10 +79,6 @@ public class TurnoDAO implements DAO<Turno>{
 
     /**
      * Busca un turno por su id.
-     *
-     * @param id id del turno
-     * @return el turno encontrado, o null si no existe
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public Turno buscarPorId(String id) throws SQLException{
@@ -110,9 +97,6 @@ public class TurnoDAO implements DAO<Turno>{
 
     /**
      * Devuelve todos los turnos, ordenados por fecha y hora.
-     *
-     * @return lista de turnos (vacia si no hay ninguno)
-     * @throws SQLException si falla la conexion o la consulta
      */
     @Override
     public List<Turno> listarTodos() throws SQLException{

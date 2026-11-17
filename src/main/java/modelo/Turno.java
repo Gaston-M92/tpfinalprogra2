@@ -116,9 +116,6 @@ public class Turno implements Identificable, Comparable<Turno> {
 
     /**
      * Verifica si este turno se superpone con otro turno.
-     *
-     * @param otro turno con el que se desea comparar.
-     * @return true si los turnos se superponen, false en caso contrario.
      */
     public boolean seSuperponeCon(Turno otro) {
         LocalDateTime inicio1 = this.fechaHora;

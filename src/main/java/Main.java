@@ -17,11 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Programa principal del consultorio.
- * Muestra un menú por consola y delega cada opción en el gestor,
- * capturando las excepciones para mostrar su mensaje al usuario.
- */
 public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);

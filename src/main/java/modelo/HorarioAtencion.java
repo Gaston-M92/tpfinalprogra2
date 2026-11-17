@@ -60,9 +60,6 @@ public class HorarioAtencion {
 
     /**
      * Verifica si una fecha y hora están comprendidas dentro del horario de atención.
-     *
-     * @param fechaHora fecha y hora que se desea verificar.
-     * @return "true" si coincide con el día y el rango horario, "false" en caso contrario.
      */
     public boolean incluye(LocalDateTime fechaHora) {
         return fechaHora.getDayOfWeek() == dia

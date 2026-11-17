@@ -58,8 +58,6 @@ public class Medico extends Persona{
 
     /**
      * Agrega un horario de atención a la lista de horarios del médico.
-     *
-     * @param h horario de atención que se desea agregar.
      */
     public void agregarHorario(HorarioAtencion h) {
         horarios.add(h);
@@ -67,9 +65,6 @@ public class Medico extends Persona{
 
     /**
      * Verifica si el médico atiende en una fecha y hora determinadas.
-     *
-     * @param fechaHora fecha y hora que se desea consultar.
-     * @return "true" si el médico atiende en ese momento, "false" en caso contrario.
      */
     public boolean atiendeEn(LocalDateTime fechaHora) {
 
@@ -86,8 +81,6 @@ public class Medico extends Persona{
 
     /**
      * Genera una ficha con los datos personales y profesionales del médico.
-     *
-     * @return cadena con la información principal del médico.
      */
     @Override
     public String generarFicha() {
