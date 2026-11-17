@@ -166,49 +166,37 @@ public class GestorTurnos implements Reportable {
      * Asigna un turno nuevo a un paciente con un medico.
      * Valida que el paciente exista, que el medico atienda en ese horario
      * y que ni el medico ni el paciente tengan otro turno que se superponga.
-     *
-     * @throws PacienteNoEncontradoException si no existe un paciente con ese DNI
-     * @throws HorarioNoDisponibleException  si el medico no atiende en ese dia y horario
-     * @throws TurnoSuperpuestoException     si el medico o el paciente ya tienen un turno en ese horario
-     * @throws SQLException                  si falla el guardado en la base de datos
      */
 
-    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo) throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException, SQLException {
+    public Turno asignarTurno(String dni, Medico m, LocalDateTime fechaHora, String motivo)
+            throws PacienteNoEncontradoException, TurnoSuperpuestoException, HorarioNoDisponibleException, SQLException {
+
         Paciente p = buscarPaciente(dni);
 
         if (!m.atiendeEn(fechaHora)) {
-            throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto() + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
+            throw new HorarioNoDisponibleException("El medico " + m.getNombreCompleto()
+                    + " no atiende el " + fechaHora.toLocalDate() + " a las " + fechaHora.toLocalTime());
         }
 
         Turno nuevoTurno = new Turno(p, m, fechaHora, motivo);
 
         for (Turno t : turnos.listar()) {
-            if (t.getEstado() == EstadoTurno.CANCELADO) {
+            if (t.getEstado() == EstadoTurno.CANCELADO || !t.seSuperponeCon(nuevoTurno)) {
                 continue;
             }
-            if (t.seSuperponeCon(nuevoTurno)) {
-                throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto() + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
+            if (t.getMedico().getDni().equals(m.getDni())) {
+                throw new TurnoSuperpuestoException("El medico " + m.getNombreCompleto()
+                        + " ya tiene un turno a las " + t.getFechaHora().toLocalTime());
             }
-            if (t.getPaciente().getDni().equals(dni) && horariosSeSolapan(t, nuevoTurno)) {
-                throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto() + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
+            if (t.getPaciente().getDni().equals(dni)) {
+                throw new TurnoSuperpuestoException("El paciente " + p.getNombreCompleto()
+                        + " ya tiene otro turno a las " + t.getFechaHora().toLocalTime());
             }
         }
 
         turnoDAO.insertar(nuevoTurno);
         turnos.agregar(nuevoTurno);
-
         return nuevoTurno;
-    }
-
-    /**
-     * Indica si los horarios de dos turnos se pisan, sin importar el medico.
-     * Se usa para validar que un paciente no tenga dos turnos al mismo tiempo.
-     */
-
-    private boolean horariosSeSolapan(Turno a, Turno b) {
-        LocalDateTime finA = a.getFechaHora().plusMinutes(a.getMedico().getDuracionTurnoMin());
-        LocalDateTime finB = b.getFechaHora().plusMinutes(b.getMedico().getDuracionTurnoMin());
-        return a.getFechaHora().isBefore(finB) && b.getFechaHora().isBefore(finA);
     }
 
     /**

@@ -50,7 +50,7 @@ public class ConexionBD {
     private static void cargarConfiguracion() throws SQLException{
         try(InputStream entrada = ConexionBD.class.getClassLoader().getResourceAsStream(ARCHIVO_CONFIG)){
             if(entrada == null){
-                throw new SQLException("No se encontro" + ARCHIVO_CONFIG + "en src/main/resources. Copia db.properties.example y completa tu clave.");
+                throw new SQLException("No se encontro " + ARCHIVO_CONFIG + " en src/main/resources. Copia db.properties.example y completa tu clave.");
             }
             Properties propiedades = new Properties();
             propiedades.load(entrada);

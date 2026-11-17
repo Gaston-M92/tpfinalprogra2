@@ -1,22 +1,16 @@
-package modelo;
-
 import Enums.Especialidad;
 import Exceptions.HorarioNoDisponibleException;
 import Exceptions.PacienteNoEncontradoException;
 import Exceptions.TurnoNoCancelableException;
 import Exceptions.TurnoSuperpuestoException;
 import gestor.GestorTurnos;
-import modelo.Consultorio;
-import modelo.HorarioAtencion;
 import modelo.Medico;
 import modelo.Paciente;
 import modelo.Turno;
 
 import java.sql.SQLException;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -36,8 +30,14 @@ public class Main {
     private static final DateTimeFormatter FORMATO_FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static void main(String[] args) throws SQLException {
-        cargarDatosDePrueba();
+    public static void main(String[] args) {
+        try {
+            gestor.cargarDatos();
+        } catch (SQLException e) {
+            System.out.println("No se pudo conectar con la base de datos: " + e.getMessage());
+            System.out.println("Revisa que MySQL este iniciado y que db.properties tenga los datos correctos.");
+            return;
+        }
 
         int opcion;
         do {
@@ -101,6 +101,8 @@ public class Main {
         } catch (PacienteNoEncontradoException | TurnoNoCancelableException
                  | HorarioNoDisponibleException | TurnoSuperpuestoException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("Error de base de datos: " + e.getMessage());
         } catch (DateTimeParseException e) {
             System.out.println("Error: formato de fecha u hora inválido.");
         } catch (Exception e) {
@@ -265,32 +267,4 @@ public class Main {
         return LocalDateTime.parse(leerTexto(mensaje), FORMATO_FECHA_HORA);
     }
 
-    // ---------- Datos de prueba ----------
-
-    private static void cargarDatosDePrueba() throws SQLException {
-        Consultorio c1 = new Consultorio(1, 1);
-        Consultorio c2 = new Consultorio(2, 1);
-        Consultorio c3 = new Consultorio(3, 2);
-
-        ArrayList<HorarioAtencion> horariosClinica = new ArrayList<>(List.of(
-                new HorarioAtencion(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(13, 0), c1),
-                new HorarioAtencion(DayOfWeek.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(13, 0), c1)));
-        ArrayList<HorarioAtencion> horariosPediatria = new ArrayList<>(List.of(
-                new HorarioAtencion(DayOfWeek.TUESDAY, LocalTime.of(14, 0), LocalTime.of(18, 0), c2),
-                new HorarioAtencion(DayOfWeek.THURSDAY, LocalTime.of(14, 0), LocalTime.of(18, 0), c2)));
-        ArrayList<HorarioAtencion> horariosCardiologia = new ArrayList<>(List.of(
-                new HorarioAtencion(DayOfWeek.FRIDAY, LocalTime.of(8, 0), LocalTime.of(12, 0), c3)));
-
-        gestor.registrarMedico(new Medico("Laura", "Gómez", "20111222", "2234111111",
-                "MP-1001", Especialidad.CLINICA_MEDICA, 30, horariosClinica));
-        gestor.registrarMedico(new Medico("Carlos", "Pérez", "20333444", "2234222222",
-                "MP-1002", Especialidad.PEDIATRIA, 20, horariosPediatria));
-        gestor.registrarMedico(new Medico("Ana", "Rodríguez", "20555666", "2234333333",
-                "MP-1003", Especialidad.CARDIOLOGIA, 30, horariosCardiologia));
-
-        gestor.registrarPaciente(new Paciente("Juan", "Martínez", "30111222", "2235444444",
-                1, "OSDE", LocalDate.of(1990, 5, 12)));
-        gestor.registrarPaciente(new Paciente("María", "López", "32333444", "2235555555",
-                2, "Swiss Medical", LocalDate.of(1985, 11, 3)));
-    }
 }
